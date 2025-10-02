@@ -495,6 +495,7 @@ GameObject:
   - component: {fileID: 963194227}
   - component: {fileID: 963194226}
   - component: {fileID: 963194229}
+  - component: {fileID: 963194230}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -589,9 +590,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9489694ced6555479df562237860ca4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 8
+  moveSpeed: 12
   leftBoundary: -4
   rightBoundary: 4
+  useArduinoInput: 1
+  allowKeyboardInput: 1
+--- !u!114 &963194230
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 963194225}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3b1420fc2ebb97449cb410bfcf429d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  portName: COM4
+  baudRate: 115200
+  leftThreshold: -10
+  rightThreshold: 10
+  invertDirection: 0
+  showDebugReadings: 1
 --- !u!1 &1613818560
 GameObject:
   m_ObjectHideFlags: 0

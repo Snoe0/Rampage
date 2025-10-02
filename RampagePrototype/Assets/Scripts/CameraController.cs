@@ -9,6 +9,23 @@ public class CameraController : MonoBehaviour
     public float leftBoundary = -5f;
     public float rightBoundary = 5f;
 
+    [Header("Input Settings")]
+    public bool useArduinoInput = true;
+    public bool allowKeyboardInput = true; // Keep keyboard as fallback
+    private ArduinoAccelerometerInput arduinoInput;
+
+    void Start()
+    {
+        if (useArduinoInput)
+        {
+            arduinoInput = GetComponent<ArduinoAccelerometerInput>();
+            if (arduinoInput == null)
+            {
+                Debug.LogWarning("ArduinoAccelerometerInput not found. Add it to the GameObject.");
+            }
+        }
+    }
+
     void Update()
     {
         HandleMovement();
@@ -18,14 +35,23 @@ public class CameraController : MonoBehaviour
     {
         float horizontalInput = 0f;
 
-        // Check for arrow key input
-        if (Input.GetKey(KeyCode.LeftArrow))
+        // Get Arduino input if enabled
+        if (useArduinoInput && arduinoInput != null)
         {
-            horizontalInput = -1f;
+            horizontalInput = arduinoInput.GetHorizontalInput();
         }
-        else if (Input.GetKey(KeyCode.RightArrow))
+
+        // Allow keyboard input as override or fallback
+        if (allowKeyboardInput && Mathf.Approximately(horizontalInput, 0f))
         {
-            horizontalInput = 1f;
+            if (Input.GetKey(KeyCode.LeftArrow))
+            {
+                horizontalInput = -1f;
+            }
+            else if (Input.GetKey(KeyCode.RightArrow))
+            {
+                horizontalInput = 1f;
+            }
         }
 
         // Calculate new position
