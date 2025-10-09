@@ -10,8 +10,8 @@ public class ArduinoAccelerometerInput : MonoBehaviour
     public int baudRate = 9600;
 
     [Header("Accelerometer Settings")]
-    public float leftThreshold = -15f; // Pitch degrees to go left
-    public float rightThreshold = 15f; // Pitch degrees to go right
+    public float leftThreshold = -0f; // Pitch degrees to go left
+    public float rightThreshold = 0f; // Pitch degrees to go right
     public bool invertDirection = false;
 
     [Header("Debug Settings")]
