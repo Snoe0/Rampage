@@ -5,7 +5,7 @@ using UnityEngine;
 public class BlockSpawner : MonoBehaviour
 {
     [Header("Block Settings")]
-    public GameObject blockPrefab; // Assign your block prefab in the inspector
+    public GameObject[] blockPrefabs; // Assign your block prefabs in the inspector
     public Vector3[] spawnRows = new Vector3[3]; // Assign 3 spawn positions as Vector3 coordinates
     
     [Header("Movement Settings")]
@@ -23,6 +23,9 @@ public class BlockSpawner : MonoBehaviour
 
     [Header("Collision Settings")]
     public GameObject cameraBody; // Assign the Body GameObject attached to the camera
+
+    [Header("UI Settings")]
+    public GameObject gameOverCanvas; // Assign the Game Over Canvas in the inspector
     
     private float currentMoveSpeed;
     private float currentSpawnInterval;
@@ -49,11 +52,17 @@ public class BlockSpawner : MonoBehaviour
                 floorMaterial = floorRenderer.material;
             }
         }
+
+        // Hide Game Over canvas at start
+        if (gameOverCanvas != null)
+        {
+            gameOverCanvas.SetActive(false);
+        }
         
         // Validate setup
-        if (blockPrefab == null)
+        if (blockPrefabs == null || blockPrefabs.Length == 0)
         {
-            Debug.LogError("Block prefab is not assigned!");
+            Debug.LogError("Block prefabs array is empty!");
             return;
         }
         
@@ -92,11 +101,19 @@ public class BlockSpawner : MonoBehaviour
 
     void CheckCollisions()
     {
-        if (cameraBody == null) return;
+        if (cameraBody == null)
+        {
+            Debug.LogError("Camera body is not assigned!");
+            return;
+        }
 
         // Get collider from camera body
         Collider bodyCollider = cameraBody.GetComponent<Collider>();
-        if (bodyCollider == null) return;
+        if (bodyCollider == null)
+        {
+            Debug.LogError("Camera body does not have a Collider component!");
+            return;
+        }
 
         // Check collision with each active block
         foreach (GameObject block in activeBlocks)
@@ -104,11 +121,29 @@ public class BlockSpawner : MonoBehaviour
             if (block != null)
             {
                 Collider blockCollider = block.GetComponent<Collider>();
-                if (blockCollider != null && bodyCollider.bounds.Intersects(blockCollider.bounds))
+                if (blockCollider == null)
+                {
+                    Debug.LogWarning($"Block '{block.name}' is missing a Collider component!");
+                    continue;
+                }
+
+                if (bodyCollider.bounds.Intersects(blockCollider.bounds))
                 {
                     // Collision detected - stop the game
                     gameActive = false;
                     Debug.Log("Game Over! Camera body collided with a block.");
+
+                    // Show Game Over canvas
+                    if (gameOverCanvas != null)
+                    {
+                        gameOverCanvas.SetActive(true);
+                        Debug.Log("Game Over canvas activated!");
+                    }
+                    else
+                    {
+                        Debug.LogError("Game Over canvas is not assigned in the inspector!");
+                    }
+
                     return;
                 }
             }
@@ -145,9 +180,13 @@ public class BlockSpawner : MonoBehaviour
         int randomRow = Random.Range(0, 3);
         Vector3 spawnPosition = spawnRows[randomRow];
 
+        // Choose a random prefab from the array
+        int randomPrefabIndex = Random.Range(0, blockPrefabs.Length);
+        GameObject selectedPrefab = blockPrefabs[randomPrefabIndex];
+
         // Spawn the block at the selected row position
-        GameObject newBlock = Instantiate(blockPrefab, spawnPosition, Quaternion.identity);
-        
+        GameObject newBlock = Instantiate(selectedPrefab, spawnPosition, Quaternion.identity);
+
         // Add to active blocks list
         activeBlocks.Add(newBlock);
 
